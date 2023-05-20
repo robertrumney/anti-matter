@@ -1,13 +1,20 @@
 // Copyright 2023 Robert Rumney Unreal Engine 48 Hour Game-Jam
+
 #include "MyPawn.h"
 #include "Engine/StaticMesh.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
-
+#include "GameFramework/Controller.h"
 
 // Sets default values
 AMyPawn::AMyPawn()
 {
+	// Enable mouse input
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationRoll = false;
+	bMouseLookEnabled = true; // Custom flag to enable/disable mouse look
+
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -21,12 +28,6 @@ AMyPawn::AMyPawn()
 	UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
 	OurVisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OurVisibleComponent"));
 
-	// Attach our camera and visible object to our root component. Offset and rotate the camera.
-	OurCamera->SetupAttachment(RootComponent);
-	OurCamera->SetRelativeLocation(FVector(-250.0f, 0.0f, 250.0f));
-	OurCamera->SetRelativeRotation(FRotator(-45.0f, 0.0f, 0.0f));
-	OurVisibleComponent->SetupAttachment(RootComponent);
-
 	// Create a cylinder mesh component
 	UStaticMeshComponent* CylinderMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CylinderMeshComponent"));
 	CylinderMeshComponent->SetupAttachment(RootComponent);
@@ -35,19 +36,34 @@ AMyPawn::AMyPawn()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
 	if (CylinderMeshAsset.Succeeded())
 	{
-		CylinderMeshComponent->SetStaticMesh(CylinderMeshAsset.Object);
+		// Check if CylinderMeshComponent is valid before assigning the static mesh
+		if (CylinderMeshComponent)
+		{
+			CylinderMeshComponent->SetStaticMesh(CylinderMeshAsset.Object);
+
+			// Adjust the relative position of the mesh by 1 unit in the Z-axis
+			CylinderMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 45.0f));
+
+			// Set the visibility of the mesh component to false
+			CylinderMeshComponent->SetVisibility(false);
+		}
 	}
 
 	// Assign the cylinder mesh component to OurVisibleComponent
 	OurVisibleComponent = CylinderMeshComponent;
-	
+
+	OurCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f)); // Adjust the relative position of the camera within the visible component
+
+	// Configure the camera as a first-person perspective
+	OurCamera->bUsePawnControlRotation = true;
+	OurCamera->SetProjectionMode(ECameraProjectionMode::Perspective);
+	OurCamera->SetFieldOfView(90.0f); // Set the desired field of view
 }
 
 // Called when the game starts or when spawned
 void AMyPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
 }
 
 // Called every frame
@@ -81,6 +97,19 @@ void AMyPawn::Tick(float DeltaTime)
 			SetActorLocation(NewLocation);
 		}
 	}
+
+	// Update the camera's location and rotation to match the pawn's
+	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	{
+		FRotator PawnRotation = GetActorRotation();
+		FVector PawnLocation = GetActorLocation();
+
+		if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
+		{
+			FVector CameraLocation = PawnLocation + FVector(0.0f, 0.0f, 100.0f);
+			CameraComponent->SetWorldLocationAndRotation(CameraLocation, PawnRotation);
+		}
+	}
 }
 
 // Called to bind functionality to input
@@ -95,18 +124,36 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	// Respond every frame to the values of our two movement axes, "MoveX" and "MoveY".
 	InputComponent->BindAxis("MoveX", this, &AMyPawn::Move_XAxis);
 	InputComponent->BindAxis("MoveY", this, &AMyPawn::Move_YAxis);
+
+	// Bind mouse input for rotation
+	InputComponent->BindAxis("Turn", this, &AMyPawn::Turn);
+	InputComponent->BindAxis("LookUp", this, &AMyPawn::LookUp);
+}
+
+void AMyPawn::Turn(float Value)
+{
+	// Update yaw rotation based on mouse movement
+	AddControllerYawInput(Value);
+}
+
+void AMyPawn::LookUp(float Value)
+{
+	// Update pitch rotation based on mouse movement
+	AddControllerPitchInput(Value);
 }
 
 void AMyPawn::Move_XAxis(float AxisValue)
 {
-	// Move at 100 units per second forward or backward
-	CurrentVelocity.X = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.0f;
+	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
+	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue;
+	SetActorLocation(Direction);
 }
 
 void AMyPawn::Move_YAxis(float AxisValue)
 {
-	// Move at 100 units per second right or left
-	CurrentVelocity.Y = FMath::Clamp(AxisValue, -1.0f, 1.0f) * 100.0f;
+	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
+	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue;
+	SetActorLocation(Direction);
 }
 
 void AMyPawn::StartGrowing()
