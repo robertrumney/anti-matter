@@ -89,26 +89,27 @@ void AMyPawn::Tick(float DeltaTime)
 		OurVisibleComponent->SetWorldScale3D(FVector(CurrentScale));
 	}
 
-	// Handle movement based on our "MoveX" and "MoveY" axes
+	// Increment headbob timer based on player's movement
+	HeadBobTimer += CurrentVelocity.Size() * DeltaTime;
+
+	// Calculate headbob offset
+	FVector HeadBobOffset = FVector(0.0f, 0.0f, 0.0f);
+
+
+	if (!CurrentVelocity.IsZero())
 	{
-		if (!CurrentVelocity.IsZero())
-		{
-			FVector NewLocation = GetActorLocation() + (CurrentVelocity * DeltaTime);
-			SetActorLocation(NewLocation);
-		}
+		float BobSpeed = 10.0f; // Adjust the speed of the headbob motion
+		float BobAmount = 5.0f; // Adjust the amount of headbob motion
+		float HeadBobAmount = FMath::Lerp(-BobAmount, BobAmount, FMath::Sin(HeadBobTimer * BobSpeed));
+
+		HeadBobOffset.Z = HeadBobAmount;
 	}
 
-	// Update the camera's location and rotation to match the pawn's
-	if (APlayerController* PlayerController = Cast<APlayerController>(GetController()))
+	// Update camera location with headbob offset
+	if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
 	{
-		FRotator PawnRotation = GetActorRotation();
-		FVector PawnLocation = GetActorLocation();
-
-		if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
-		{
-			FVector CameraLocation = PawnLocation + FVector(0.0f, 0.0f, 100.0f);
-			CameraComponent->SetWorldLocationAndRotation(CameraLocation, PawnRotation);
-		}
+		FVector CameraLocation = GetActorLocation() + FVector(0.0f, 0.0f, 250.0f) + HeadBobOffset;
+		CameraComponent->SetWorldLocationAndRotation(CameraLocation, GetActorRotation());
 	}
 }
 
@@ -128,6 +129,12 @@ void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	// Bind mouse input for rotation
 	InputComponent->BindAxis("Turn", this, &AMyPawn::Turn);
 	InputComponent->BindAxis("LookUp", this, &AMyPawn::LookUp);
+
+	// Bind the right mouse button press event
+	PlayerInputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AMyPawn::OnRightMouseButtonDown);
+
+	// Bind the right mouse button release event
+	PlayerInputComponent->BindAction("RightMouseButton", IE_Released, this, &AMyPawn::OnRightMouseButtonUp);
 }
 
 void AMyPawn::Turn(float Value)
@@ -145,8 +152,9 @@ void AMyPawn::LookUp(float Value)
 void AMyPawn::Move_XAxis(float AxisValue)
 {
 	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
-	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue;
+	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue * MovementSpeed;
 	SetActorLocation(Direction);
+	CurrentVelocity.X = AxisValue;
 }
 
 void AMyPawn::Move_YAxis(float AxisValue)
@@ -154,6 +162,7 @@ void AMyPawn::Move_YAxis(float AxisValue)
 	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
 	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue;
 	SetActorLocation(Direction);
+	CurrentVelocity.Y = AxisValue;
 }
 
 void AMyPawn::StartGrowing()
@@ -164,4 +173,24 @@ void AMyPawn::StartGrowing()
 void AMyPawn::StopGrowing()
 {
 	bGrowing = false;
+}
+
+// Function to handle right mouse button press
+void AMyPawn::OnRightMouseButtonDown()
+{
+	bIsZooming = true;
+	
+	if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
+	{
+		InitialFOV = CameraComponent->FieldOfView;
+	}
+
+	LerpingAlpha = 0.0f;
+}
+
+// Function to handle right mouse button release
+void AMyPawn::OnRightMouseButtonUp()
+{
+	bIsZooming = false;
+	LerpingAlpha = 0.0f;
 }
