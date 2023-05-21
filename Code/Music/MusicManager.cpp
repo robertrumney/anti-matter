@@ -54,15 +54,8 @@ void AMusicManager::PlayMonologue()
 {
     if (MonologueSound != nullptr)
     {
-        // Set monologue sound and loop mode
+        // Set monologue sound
         MonologueAudioComponent->SetSound(MonologueSound);
-
-        // Set monolgue looping
-        if (MonologueSound->IsA<USoundWave>())
-        {
-            USoundWave* SoundWave = Cast<USoundWave>(MonologueSound);
-            SoundWave->bLooping = bLoopMusic; // Remember to change this if you want a different looping behavior for the monologue
-        }
 
         // Set monologue volume
         MonologueAudioComponent->SetVolumeMultiplier(MonologueVolume);
