@@ -1,7 +1,7 @@
 // Copyright 2023 Robert Rumney Unreal Engine 48 Hour Game-Jam
 
 #pragma once
-
+#include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "FPSPlayer.generated.h"
@@ -25,6 +25,9 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, Category = "Components")
+		UCapsuleComponent* CapsuleComponent;
 
 	UPROPERTY(EditAnywhere)
 		USceneComponent* OurVisibleComponent;
