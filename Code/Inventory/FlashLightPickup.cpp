@@ -1,7 +1,12 @@
-#include "FlashLightPickup.h"
-#include "Components/SphereComponent.h"
+// Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
+
 #include "FPSPlayer.h"
+#include "FlashLightPickup.h"
+
+#include "Components/AudioComponent.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundBase.h"
 
 // Sets default values
 AFlashLightPickup::AFlashLightPickup()
@@ -13,6 +18,9 @@ AFlashLightPickup::AFlashLightPickup()
     SphereComponent->SetSphereRadius(100.0f);
     SphereComponent->SetSimulatePhysics(true); // Enable physics simulation
     SphereComponent->SetNotifyRigidBodyCollision(true); // Ensure it generates hit events
+
+    AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+    AudioComponent->bAutoActivate = false; // Do not play the sound immediately when the game starts
 }
 
 // Called when the game starts or when spawned
@@ -29,21 +37,27 @@ void AFlashLightPickup::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
 
     if (Player != nullptr)
     {
-        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player has overlapped with the flashlight."));
+        if (bActionPerformed)
+            return;
+
+        bActionPerformed = true;
+
+        // Play the pickup sound
+        if (PickupSound != nullptr)
+        {
+            AudioComponent->SetSound(PickupSound);
+            AudioComponent->Play();
+        }
 
         if (FlashlightActor != nullptr)
         {
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FlashlightActor is not null. Preparing to destroy..."));
             FlashlightActor->Destroy();
-
             FlashlightActor = nullptr;
         }
-        else
-        {
-            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FlashlightActor is null. Not destroying..."));
-        }
 
-        // Destroy the pickup
-        Destroy();
+        Player->PickupFlashlight();
+
+        //  // Destroy the pickup after a delay to allow the sound to finish playing
+        SetLifeSpan(PickupSound->Duration);
     }
 }
