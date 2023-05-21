@@ -25,14 +25,25 @@ void AFlashLightPickup::BeginPlay()
 
 void AFlashLightPickup::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-    // Log a message to ensure the hit event is firing
-    UE_LOG(LogTemp, Warning, TEXT("FlashLightPickup has been hit."));
-
     AFPSPlayer* Player = Cast<AFPSPlayer>(OtherActor);
 
-    if (Player)
+    if (Player != nullptr)
     {
-        // Do something when the player hits the flashlight pickup
-        UE_LOG(LogTemp, Warning, TEXT("Player has hit the flashlight pickup."));
+        GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Player has overlapped with the flashlight."));
+
+        if (FlashlightActor != nullptr)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FlashlightActor is not null. Preparing to destroy..."));
+            FlashlightActor->Destroy();
+
+            FlashlightActor = nullptr;
+        }
+        else
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("FlashlightActor is null. Not destroying..."));
+        }
+
+        // Destroy the pickup
+        Destroy();
     }
 }
