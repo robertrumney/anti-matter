@@ -7,7 +7,7 @@ The Music Manager is a C++ class designed managing music and monologues with a d
 - Play background music with looping and adjustable volume.
 - Simultaneously play & mix voice monologues or SFX from the same actor with looping and adjustable volume.
 - Easy integration into Unreal Engine projects.
-- Customizable looping behavior for music and monologues.
+- Customizable looping behavior for music
 
 ## Usage
 
