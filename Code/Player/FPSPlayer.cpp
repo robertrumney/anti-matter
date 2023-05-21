@@ -4,6 +4,7 @@
 #include "Engine/StaticMesh.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 
 // Sets default values
@@ -21,60 +22,40 @@ AFPSPlayer::AFPSPlayer()
 	// Set this pawn to be controlled by the lowest-numbered player
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 
-	// Create a dummy root component we can attach things to.
-	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
-
-	// Create a camera and a visible object
+	// Create a camera and attach to root
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	UCameraComponent* OurCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("OurCamera"));
-	OurVisibleComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("OurVisibleComponent"));
+	OurCamera->SetupAttachment(RootComponent);
 
-	// Create a cylinder mesh component
-	UStaticMeshComponent* CylinderMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CylinderMeshComponent"));
-	CylinderMeshComponent->SetupAttachment(RootComponent);
-
-	UE_LOG(LogTemp, Error, TEXT("This is a warning message"));
-
-	// Load the cylinder static mesh
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
-	if (CylinderMeshAsset.Succeeded())
-	{
-		// Check if CylinderMeshComponent is valid before assigning the static mesh
-		if (CylinderMeshComponent)
-		{
-			CylinderMeshComponent->SetStaticMesh(CylinderMeshAsset.Object);
-
-			// Adjust the relative position of the mesh by 1 unit in the Z-axis
-			CylinderMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 45.0f));
-
-			// Set the visibility of the mesh component to false
-			//CylinderMeshComponent->SetVisibility(false);
-
-			// Enable collision and physics simulation
-			CylinderMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-			CylinderMeshComponent->SetSimulatePhysics(true);
-
-			// Adjust collision response
-			CylinderMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-
-			// Set the collision profile
-			CylinderMeshComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
-
-			// Set the relative location and rotation
-			CylinderMeshComponent->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
-
-			UE_LOG(LogTemp, Error, TEXT("Did the damn thing"));
-		}
-	}
-
-	// Assign the cylinder mesh component to OurVisibleComponent
-	OurVisibleComponent = CylinderMeshComponent;
-
-	OurCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 100.0f)); // Adjust the relative position of the camera within the visible component
+	// Adjust the relative position of the camera within the visible component
+	OurCamera->SetRelativeLocation(FVector(0.0f, 0.0f, 50.0f)); 
 
 	// Configure the camera as a first-person perspective
 	OurCamera->bUsePawnControlRotation = true;
 	OurCamera->SetProjectionMode(ECameraProjectionMode::Perspective);
 	OurCamera->SetFieldOfView(90.0f); // Set the desired field of view
+
+	// Create the CapsuleComponent
+	//UCapsuleComponent* CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("MyCapsuleComponent"));
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("MyCapsuleComponent"));
+	CapsuleComponent->InitCapsuleSize(34.0f, 88.0f);
+
+	// Set the CapsuleComponent as the root component
+	RootComponent = CapsuleComponent;
+
+	// Enable physics simulation for the CapsuleComponent
+	CapsuleComponent->SetSimulatePhysics(true);
+
+	// Make collision settings editable in the inspector
+	CapsuleComponent->SetCollisionProfileName(TEXT("BlockAll"));  // Set collision profile
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);  // Set collision enabled to PhysicsOnly
+	CapsuleComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);  // Set collision response
+	CapsuleComponent->SetCollisionObjectType(ECC_Pawn);  // Set collision object type
+	CapsuleComponent->SetGenerateOverlapEvents(true);  // Enable overlap events
+	CapsuleComponent->SetCanEverAffectNavigation(true);  // Enable navigation interaction
+	CapsuleComponent->SetEnableGravity(true);  // Enable gravity
+
+	CapsuleComponent->bApplyImpulseOnDamage = true;  // Enable impulse on damage
 }
 
 // Called when the game starts or when spawned
@@ -110,7 +91,7 @@ void AFPSPlayer::Tick(float DeltaTime)
 	// Update camera location with headbob offset
 	if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
 	{
-		FVector CameraLocation = GetActorLocation() + FVector(0.0f, 0.0f, 250.0f) + HeadBobOffset;
+		FVector CameraLocation = GetActorLocation() + FVector(0.0f, 0.0f, 200.0f) + HeadBobOffset;
 		CameraComponent->SetWorldLocationAndRotation(CameraLocation, GetActorRotation());
 
 		// Perform lerping if zooming is active
@@ -169,18 +150,28 @@ void AFPSPlayer::LookUp(float Value)
 
 void AFPSPlayer::Move_XAxis(float AxisValue)
 {
-	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
-	const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue * MovementSpeed;
-	AddActorWorldOffset(Direction);
-	CurrentVelocity.X = AxisValue;
+	if (AxisValue == 0.f) {
+		CurrentVelocity.X = 0;
+	}
+	else {
+		const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
+		const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue * MovementSpeed;
+		AddActorWorldOffset(Direction, true);  // Added sweeping for collision detection
+		CurrentVelocity.X = AxisValue;
+	}
 }
 
 void AFPSPlayer::Move_YAxis(float AxisValue)
 {
-	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
-	const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue * MovementSpeed;
-	AddActorWorldOffset(Direction);
-	CurrentVelocity.Y = AxisValue;
+	if (AxisValue == 0.f) {
+		CurrentVelocity.Y = 0;
+	}
+	else {
+		const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
+		const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue * MovementSpeed;
+		AddActorWorldOffset(Direction, true);  // Added sweeping for collision detection
+		CurrentVelocity.Y = AxisValue;
+	}
 }
 
 // Function to handle right mouse button press
