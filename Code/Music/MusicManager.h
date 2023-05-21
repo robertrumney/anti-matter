@@ -1,3 +1,5 @@
+// Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -16,25 +18,31 @@ protected:
     virtual void BeginPlay() override;
 
 public:
-    UPROPERTY(EditAnywhere, Category = "Music")
-    class USoundBase* MusicSound;
+    UAudioComponent* MusicAudioComponent;
+    UAudioComponent* MonologueAudioComponent;
 
     UPROPERTY(EditAnywhere, Category = "Music")
-    bool bLoopMusic;
+        class USoundBase* MusicSound;
 
     UPROPERTY(EditAnywhere, Category = "Music")
-    float MusicVolume;
+        bool bLoopMusic;
+
+    UPROPERTY(EditAnywhere, Category = "Music")
+        float MusicVolume;
 
     UPROPERTY(EditAnywhere, Category = "Monologue")
-    float MonologueVolume;
+        float MonologueVolume;
+
+    UPROPERTY(EditAnywhere, Category = "Monologue")
+        class USoundBase* MonologueSound;
 
     UFUNCTION(BlueprintCallable, Category = "Music")
-    void PlayMusic();
+        void PlayMusic();
 
     UFUNCTION(BlueprintCallable, Category = "Monologue")
-    void PlayMonologue(class USoundBase* MonologueSound);
+        void PlayMonologue();
 
 private:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-    class UAudioComponent* AudioComponent;
+        class UAudioComponent* AudioComponent;
 };
