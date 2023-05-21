@@ -1,13 +1,13 @@
 // Copyright 2023 Robert Rumney Unreal Engine 48 Hour Game-Jam
 
-#include "MyPawn.h"
+#include "FPSPlayer.h"
 #include "Engine/StaticMesh.h"
 #include "Camera/CameraComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Controller.h"
 
 // Sets default values
-AMyPawn::AMyPawn()
+AFPSPlayer::AFPSPlayer()
 {
 	// Enable mouse input
 	bUseControllerRotationYaw = false;
@@ -15,7 +15,7 @@ AMyPawn::AMyPawn()
 	bUseControllerRotationRoll = false;
 	bMouseLookEnabled = true; // Custom flag to enable/disable mouse look
 
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	// Set this pawn to be controlled by the lowest-numbered player
@@ -32,6 +32,8 @@ AMyPawn::AMyPawn()
 	UStaticMeshComponent* CylinderMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CylinderMeshComponent"));
 	CylinderMeshComponent->SetupAttachment(RootComponent);
 
+	UE_LOG(LogTemp, Error, TEXT("This is a warning message"));
+
 	// Load the cylinder static mesh
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderMeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cylinder.Cylinder'"));
 	if (CylinderMeshAsset.Succeeded())
@@ -45,7 +47,22 @@ AMyPawn::AMyPawn()
 			CylinderMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 45.0f));
 
 			// Set the visibility of the mesh component to false
-			CylinderMeshComponent->SetVisibility(false);
+			//CylinderMeshComponent->SetVisibility(false);
+
+			// Enable collision and physics simulation
+			CylinderMeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+			CylinderMeshComponent->SetSimulatePhysics(true);
+
+			// Adjust collision response
+			CylinderMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+
+			// Set the collision profile
+			CylinderMeshComponent->SetCollisionProfileName(TEXT("BlockAllDynamic"));
+
+			// Set the relative location and rotation
+			CylinderMeshComponent->SetRelativeLocationAndRotation(FVector::ZeroVector, FRotator::ZeroRotator);
+
+			UE_LOG(LogTemp, Error, TEXT("Did the damn thing"));
 		}
 	}
 
@@ -61,40 +78,21 @@ AMyPawn::AMyPawn()
 }
 
 // Called when the game starts or when spawned
-void AMyPawn::BeginPlay()
+void AFPSPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
 // Called every frame
-void AMyPawn::Tick(float DeltaTime)
+void AFPSPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// Handle growing and shrinking based on our "Grow" action
-	{
-		float CurrentScale = OurVisibleComponent->GetComponentScale().X;
-		if (bGrowing)
-		{
-			// Grow to double size over the course of one second
-			CurrentScale += DeltaTime;
-		}
-		else
-		{
-			// Shrink half as fast as we grow
-			CurrentScale -= (DeltaTime * 0.5f);
-		}
-		// Make sure we never drop below our starting size, or increase past double size.
-		CurrentScale = FMath::Clamp(CurrentScale, 1.0f, 2.0f);
-		OurVisibleComponent->SetWorldScale3D(FVector(CurrentScale));
-	}
 
 	// Increment headbob timer based on player's movement
 	HeadBobTimer += CurrentVelocity.Size() * DeltaTime;
 
 	// Calculate headbob offset
 	FVector HeadBobOffset = FVector(0.0f, 0.0f, 0.0f);
-
 
 	if (!CurrentVelocity.IsZero())
 	{
@@ -104,82 +102,92 @@ void AMyPawn::Tick(float DeltaTime)
 
 		HeadBobOffset.Z = HeadBobAmount;
 	}
+	else
+	{
+		HeadBobTimer = 0;
+	}
 
 	// Update camera location with headbob offset
 	if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
 	{
 		FVector CameraLocation = GetActorLocation() + FVector(0.0f, 0.0f, 250.0f) + HeadBobOffset;
 		CameraComponent->SetWorldLocationAndRotation(CameraLocation, GetActorRotation());
+
+		// Perform lerping if zooming is active
+		if (bIsZooming)
+		{
+			if (LerpingAlpha < MaxZoom)
+				LerpingAlpha += DeltaTime;
+
+			float LerpedFOV = FMath::Lerp(InitialFOV, ZoomedInFOV, LerpingAlpha);
+			CameraComponent->SetFieldOfView(LerpedFOV);
+		}
+		else
+		{
+			// Perform lerping for zooming out when not active
+			if (LerpingAlpha > 0.0f)
+			{
+				LerpingAlpha -= DeltaTime;
+				float LerpedFOV = FMath::Lerp(InitialFOV, ZoomedInFOV, LerpingAlpha);
+				CameraComponent->SetFieldOfView(LerpedFOV);
+			}
+		}
 	}
 }
 
 // Called to bind functionality to input
-void AMyPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AFPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	// Respond when our "Grow" key is pressed or released.
-	InputComponent->BindAction("Grow", IE_Pressed, this, &AMyPawn::StartGrowing);
-	InputComponent->BindAction("Grow", IE_Released, this, &AMyPawn::StopGrowing);
-
 	// Respond every frame to the values of our two movement axes, "MoveX" and "MoveY".
-	InputComponent->BindAxis("MoveX", this, &AMyPawn::Move_XAxis);
-	InputComponent->BindAxis("MoveY", this, &AMyPawn::Move_YAxis);
+	InputComponent->BindAxis("MoveX", this, &AFPSPlayer::Move_XAxis);
+	InputComponent->BindAxis("MoveY", this, &AFPSPlayer::Move_YAxis);
 
 	// Bind mouse input for rotation
-	InputComponent->BindAxis("Turn", this, &AMyPawn::Turn);
-	InputComponent->BindAxis("LookUp", this, &AMyPawn::LookUp);
+	InputComponent->BindAxis("Turn", this, &AFPSPlayer::Turn);
+	InputComponent->BindAxis("LookUp", this, &AFPSPlayer::LookUp);
 
 	// Bind the right mouse button press event
-	PlayerInputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AMyPawn::OnRightMouseButtonDown);
+	InputComponent->BindAction("RightMouseButton", IE_Pressed, this, &AFPSPlayer::OnRightMouseButtonDown);
 
 	// Bind the right mouse button release event
-	PlayerInputComponent->BindAction("RightMouseButton", IE_Released, this, &AMyPawn::OnRightMouseButtonUp);
+	InputComponent->BindAction("RightMouseButton", IE_Released, this, &AFPSPlayer::OnRightMouseButtonUp);
 }
 
-void AMyPawn::Turn(float Value)
+void AFPSPlayer::Turn(float Value)
 {
 	// Update yaw rotation based on mouse movement
 	AddControllerYawInput(Value);
 }
 
-void AMyPawn::LookUp(float Value)
+void AFPSPlayer::LookUp(float Value)
 {
 	// Update pitch rotation based on mouse movement
 	AddControllerPitchInput(Value);
 }
 
-void AMyPawn::Move_XAxis(float AxisValue)
+void AFPSPlayer::Move_XAxis(float AxisValue)
 {
 	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
-	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue * MovementSpeed;
-	SetActorLocation(Direction);
+	const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue * MovementSpeed;
+	AddActorWorldOffset(Direction);
 	CurrentVelocity.X = AxisValue;
 }
 
-void AMyPawn::Move_YAxis(float AxisValue)
+void AFPSPlayer::Move_YAxis(float AxisValue)
 {
 	const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
-	const FVector Direction = GetActorLocation() + FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue;
-	SetActorLocation(Direction);
+	const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue * MovementSpeed;
+	AddActorWorldOffset(Direction);
 	CurrentVelocity.Y = AxisValue;
 }
 
-void AMyPawn::StartGrowing()
-{
-	bGrowing = true;
-}
-
-void AMyPawn::StopGrowing()
-{
-	bGrowing = false;
-}
-
 // Function to handle right mouse button press
-void AMyPawn::OnRightMouseButtonDown()
+void AFPSPlayer::OnRightMouseButtonDown()
 {
 	bIsZooming = true;
-	
+
 	if (UCameraComponent* CameraComponent = FindComponentByClass<UCameraComponent>())
 	{
 		InitialFOV = CameraComponent->FieldOfView;
@@ -189,8 +197,7 @@ void AMyPawn::OnRightMouseButtonDown()
 }
 
 // Function to handle right mouse button release
-void AMyPawn::OnRightMouseButtonUp()
+void AFPSPlayer::OnRightMouseButtonUp()
 {
 	bIsZooming = false;
-	LerpingAlpha = 0.0f;
 }
