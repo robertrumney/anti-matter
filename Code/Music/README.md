@@ -1,6 +1,6 @@
 # Music Manager
 
-The Music Manager is a C++ class designed for managing music and monologues in a game built with Unreal Engine. It provides functionality to play music and monologues using audio components and sound assets.
+The Music Manager is a C++ class designed managing music and monologues with a drag and drop interface within the Unreal Engine C++ 48 Hour Game-Jam
 
 ## Features
 
@@ -46,3 +46,23 @@ MusicManager->MonologueVolume = 0.5f;
 MusicManager->PlayMusic();
 MusicManager->PlayMonologue();
 ```
+
+## Note
+
+In this example we delay the monologue start by 2 seconds
+```cpp
+void AMusicManager::BeginPlay()
+{
+    Super::BeginPlay();
+
+    // Play the music and monologue
+    PlayMusic();
+
+    // Set a timer to call PlayMonologue after a delay
+    FTimerHandle MonologueTimerHandle;
+    GetWorld()->GetTimerManager().SetTimer(MonologueTimerHandle, this, &AMusicManager::PlayMonologue, 2.0f, false);
+}
+```
+
+### Copyright
+Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
