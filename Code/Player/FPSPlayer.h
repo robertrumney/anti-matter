@@ -4,23 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "MyPawn.generated.h"
+#include "FPSPlayer.generated.h"
 
 UCLASS()
-class ANTIMATTERGAME_API AMyPawn : public APawn
+class ANTIMATTERGAME_API AFPSPlayer : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	AMyPawn();
-	
+	AFPSPlayer();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -28,19 +27,24 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UPROPERTY(EditAnywhere)
-	USceneComponent* OurVisibleComponent;
+		USceneComponent* OurVisibleComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+		float CollisionSphereRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+		float CollisionCapsuleRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
+		float CollisionCapsuleHalfHeight;
 
 	//Input functions
 	void Move_XAxis(float AxisValue);
 	void Move_YAxis(float AxisValue);
-	void StartGrowing();
-	void StopGrowing();
-
-	void OnRightMouseButtonUp();
-	void OnRightMouseButtonDown();
-
 	void Turn(float AxisValue);
 	void LookUp(float AxisValue);
+	void OnRightMouseButtonUp();
+	void OnRightMouseButtonDown();
 
 	//Input variables
 	FVector CurrentVelocity;
@@ -49,12 +53,13 @@ public:
 	float MovementSpeed = 4;
 
 	float HeadBobTimer;
-	
+
 	// Declare a variable to store the initial camera FOV
 	float InitialFOV;
 
 	// Declare a variable to store the target zoomed-in FOV
 	float ZoomedInFOV = 60.0f;
+	float MaxZoom = 2;
 
 	// Declare a variable to store the lerping alpha
 	float LerpingAlpha = 0.0f;
