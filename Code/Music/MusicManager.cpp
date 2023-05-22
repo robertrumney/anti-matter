@@ -25,7 +25,7 @@ void AMusicManager::BeginPlay()
 
     // Set a timer to call PlayMonologue after a delay
     FTimerHandle MonologueTimerHandle;
-    GetWorld()->GetTimerManager().SetTimer(MonologueTimerHandle, this, &AMusicManager::PlayMonologue, 2.0f, false);
+    GetWorld()->GetTimerManager().SetTimer(MonologueTimerHandle, this, &AMusicManager::PlayMonologue, MonologueDelay, false);
 }
 
 void AMusicManager::PlayMusic()
@@ -54,11 +54,14 @@ void AMusicManager::PlayMonologue()
 {
     if (MonologueSound != nullptr)
     {
-        // Set monologue sound
+        // Set monologue sound and loop mode
         MonologueAudioComponent->SetSound(MonologueSound);
 
         // Set monologue volume
         MonologueAudioComponent->SetVolumeMultiplier(MonologueVolume);
+
+        // Set pitch slightly down
+        MonologueAudioComponent->SetPitchMultiplier(MonologuePitch);
 
         // Play the monologue
         MonologueAudioComponent->Play();
