@@ -1,7 +1,7 @@
 // Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
 
-#include "FPSPlayer.h"
 #include "FlashLightPickup.h"
+#include "FPSPlayer.h"
 
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
@@ -49,13 +49,13 @@ void AFlashLightPickup::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherAc
             AudioComponent->Play();
         }
 
-        if (FlashlightActor != nullptr)
+        if (FlashLightActor != nullptr)
         {
-            FlashlightActor->Destroy();
-            FlashlightActor = nullptr;
+            FlashLightActor->Destroy();
+            FlashLightActor = nullptr;
         }
 
-        Player->PickupFlashlight();
+        Player->PickupFlashLight();
 
         //  // Destroy the pickup after a delay to allow the sound to finish playing
         SetLifeSpan(PickupSound->Duration);
