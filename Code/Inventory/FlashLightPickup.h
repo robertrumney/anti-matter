@@ -19,8 +19,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 		class USphereComponent* SphereComponent; 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Flashlight")
-		AActor* FlashlightActor;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FlashLight")
+		AActor* FlashLightActor;
 
 protected:
 	// Called when the game starts or when spawned
