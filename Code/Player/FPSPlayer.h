@@ -1,6 +1,7 @@
 // Copyright 2023 Robert Rumney Unreal Engine 48 Hour Game-Jam
 
 #pragma once
+#include "FlashLight.h"
 #include "Components/CapsuleComponent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
@@ -10,6 +11,9 @@ UCLASS()
 class ANTIMATTERGAME_API AFPSPlayer : public APawn
 {
 	GENERATED_BODY()
+
+private:
+	AFlashLight* FlashLight;
 
 public:
 	// Sets default values for this pawn's properties
@@ -26,20 +30,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+		bool bHasFlashlight;
+
 	UPROPERTY(EditAnywhere, Category = "Components")
 		UCapsuleComponent* CapsuleComponent;
-
-	UPROPERTY(EditAnywhere)
-		USceneComponent* OurVisibleComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
-		float CollisionSphereRadius;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
-		float CollisionCapsuleRadius;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Collision")
-		float CollisionCapsuleHalfHeight;
 
 	//Input functions
 	void Move_XAxis(float AxisValue);
@@ -48,12 +43,24 @@ public:
 	void LookUp(float AxisValue);
 	void OnRightMouseButtonUp();
 	void OnRightMouseButtonDown();
+	void PickupFlashLight();
+	void BeginSprint();
+	void EndSprint();
 
 	//Input variables
 	FVector CurrentVelocity;
 	bool bGrowing;
 	bool bMouseLookEnabled;
-	float MovementSpeed = 4;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+		float MovementSpeed = 4;
+
+	// Inside FPSPlayer.h
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float DefaultMovementSpeed = 2.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+		float SprintingMovementSpeed = 6.0f;
 
 	float HeadBobTimer;
 
