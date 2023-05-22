@@ -1,10 +1,15 @@
 // Copyright 2023 Robert Rumney Unreal Engine 48 Hour Game-Jam
 
 #include "FPSPlayer.h"
+#include "FlashLight.h" 
+
 #include "Engine/StaticMesh.h"
 #include "Camera/CameraComponent.h"
+
 #include "Components/StaticMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SpotLightComponent.h"
+
 #include "GameFramework/Controller.h"
 
 // Sets default values
@@ -54,7 +59,6 @@ AFPSPlayer::AFPSPlayer()
 	CapsuleComponent->SetGenerateOverlapEvents(true);  // Enable overlap events
 	CapsuleComponent->SetCanEverAffectNavigation(true);  // Enable navigation interaction
 	CapsuleComponent->SetEnableGravity(true);  // Enable gravity
-
 	CapsuleComponent->bApplyImpulseOnDamage = true;  // Enable impulse on damage
 }
 
@@ -77,7 +81,8 @@ void AFPSPlayer::Tick(float DeltaTime)
 
 	if (!CurrentVelocity.IsZero())
 	{
-		float BobSpeed = 10.0f; // Adjust the speed of the headbob motion
+		//float BobSpeed = 10.0f; // Adjust the speed of the headbob motion
+		float BobSpeed = 2.5f * MovementSpeed;
 		float BobAmount = 5.0f; // Adjust the amount of headbob motion
 		float HeadBobAmount = FMath::Lerp(-BobAmount, BobAmount, FMath::Sin(HeadBobTimer * BobSpeed));
 
@@ -134,6 +139,22 @@ void AFPSPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 	// Bind the right mouse button release event
 	InputComponent->BindAction("RightMouseButton", IE_Released, this, &AFPSPlayer::OnRightMouseButtonUp);
+
+	// Inside AFPSPlayer::SetupPlayerInputComponent
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &AFPSPlayer::BeginSprint);
+	InputComponent->BindAction("Sprint", IE_Released, this, &AFPSPlayer::EndSprint);
+}
+
+void AFPSPlayer::BeginSprint()
+{
+	// Increase movement speed
+	MovementSpeed = SprintingMovementSpeed;
+}
+
+void AFPSPlayer::EndSprint()
+{
+	// Decrease movement speed
+	MovementSpeed = DefaultMovementSpeed;
 }
 
 void AFPSPlayer::Turn(float Value)
@@ -150,10 +171,12 @@ void AFPSPlayer::LookUp(float Value)
 
 void AFPSPlayer::Move_XAxis(float AxisValue)
 {
-	if (AxisValue == 0.f) {
+	if (AxisValue == 0.f) 
+	{
 		CurrentVelocity.X = 0;
 	}
-	else {
+	else 
+	{
 		const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
 		const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::X) * AxisValue * MovementSpeed;
 		AddActorWorldOffset(Direction, true);  // Added sweeping for collision detection
@@ -163,10 +186,12 @@ void AFPSPlayer::Move_XAxis(float AxisValue)
 
 void AFPSPlayer::Move_YAxis(float AxisValue)
 {
-	if (AxisValue == 0.f) {
+	if (AxisValue == 0.f) 
+	{
 		CurrentVelocity.Y = 0;
 	}
-	else {
+	else 
+	{
 		const FRotator Rotation(0.f, GetControlRotation().Yaw, 0.f);
 		const FVector Direction = FRotationMatrix(Rotation).GetUnitAxis(EAxis::Y) * AxisValue * MovementSpeed;
 		AddActorWorldOffset(Direction, true);  // Added sweeping for collision detection
@@ -191,4 +216,42 @@ void AFPSPlayer::OnRightMouseButtonDown()
 void AFPSPlayer::OnRightMouseButtonUp()
 {
 	bIsZooming = false;
+}
+
+void AFPSPlayer::PickupFlashLight()
+{
+	if (!bHasFlashlight)
+	{
+		// Spawn the flashlight actor at the player's location
+		FlashLight = GetWorld()->SpawnActor<AFlashLight>(AFlashLight::StaticClass(), GetActorTransform());
+
+		// Check if flashlight is successfully spawned
+		if (FlashLight)
+		{
+			// Attach the flashlight actor to the player's mesh
+			FlashLight->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+
+			// If the flashlight should be attached to a specific socket on the player's mesh, use this instead:
+			// Flashlight->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SocketName"));
+
+			bHasFlashlight = true;
+
+			// Add spotlight component to the flashlight actor
+			USpotLightComponent* Spotlight = NewObject<USpotLightComponent>(FlashLight);
+			if (Spotlight)
+			{
+				// Set the properties of the spotlight
+				Spotlight->SetIntensity(5000.f);
+				Spotlight->SetOuterConeAngle(45.f);
+				Spotlight->SetInnerConeAngle(40.f);
+				Spotlight->SetAttenuationRadius(1000.f);
+				Spotlight->SetLightColor(FLinearColor::White);
+				Spotlight->SetCastShadows(true);
+				Spotlight->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+
+				// Attach the spotlight to the flashlight actor
+				Spotlight->AttachToComponent(FlashLight->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			}
+		}
+	}
 }
