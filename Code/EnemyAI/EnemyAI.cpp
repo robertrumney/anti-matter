@@ -1,40 +1,45 @@
-// EnemyAI.cpp
+// Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
 
 #include "EnemyAI.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 AEnemyAI::AEnemyAI()
 {
-	// Set this actor to call Tick() every frame
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-// Called when the game starts or when spawned
 void AEnemyAI::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Set up a timer to call the FollowPlayer function after ActivationTime seconds
-	GetWorld()->GetTimerManager().SetTimer(ActivationTimerHandle, this, &AEnemyAI::FollowPlayer, ActivationTime);
+	GetWorld()->GetTimerManager().SetTimer(ActivationTimerHandle, this, &AEnemyAI::StartTicking, ActivationTime, false);
 }
 
-// Called every frame
+void AEnemyAI::StartTicking()
+{
+	PrimaryActorTick.bCanEverTick = true;
+}
+
 void AEnemyAI::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (PrimaryActorTick.bCanEverTick)
+	{
+		FollowPlayer();
+	}
 }
 
 void AEnemyAI::FollowPlayer()
 {
-	// Check if the PlayerActor exists
-	if (PlayerActor)
+	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "Hi, it's meeeeeep!");
+
+	if (PlayerActor && EnemyActor)
 	{
-		// Get the direction to the player
-		FVector Direction = PlayerActor->GetActorLocation() - GetActorLocation();
+		FVector Direction = PlayerActor->GetActorLocation() - EnemyActor->GetActorLocation();
 		Direction.Normalize();
 
-		// Move towards the player
-		SetActorLocation(GetActorLocation() + Direction * 100 * GetWorld()->GetDeltaSeconds());
+		float DeltaTime = GetWorld()->GetDeltaSeconds();
+		EnemyActor->SetActorLocation(EnemyActor->GetActorLocation() + Direction * 100 * DeltaTime);
 	}
 }
