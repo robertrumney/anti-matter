@@ -34,6 +34,12 @@ public:
         float MonologueVolume;
 
     UPROPERTY(EditAnywhere, Category = "Monologue")
+        float MonologueDelay;
+
+    UPROPERTY(EditAnywhere, Category = "Monologue")
+        float MonologuePitch;
+
+    UPROPERTY(EditAnywhere, Category = "Monologue")
         class USoundBase* MonologueSound;
 
     UFUNCTION(BlueprintCallable, Category = "Music")
