@@ -1,6 +1,6 @@
 # FlashLightPickup
 
-This repository contains the source code for a flashlight pickup feature implemented in Unreal Engine using C++. The flashlight pickup allows players to collect flashlights in the game, triggering specific actions and effects.
+This folder contains the source code for a flashlight pickup feature implemented in Unreal Engine using C++. The flashlight pickup allows players to collect flashlights in the game, triggering specific actions and effects.
 
 ## Overview
 
