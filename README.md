@@ -1,12 +1,6 @@
 # Anti Matter
 48 Hour Unreal Engine game jam in C++ with no blueprints or marketplace plugins.
 
-### Sample Gameplay:
-[![Sample Gameplay](https://img.youtube.com/vi/cHrWfGWt8Mk/0.jpg)](https://www.youtube.com/watch?v=cHrWfGWt8Mk)
-
-### Time-Lapse Video:
-[![Time-Lapse Video](https://img.youtube.com/vi/csn6bAA6DLI/0.jpg)](https://www.youtube.com/watch?v=csn6bAA6DLI)
-
 ## Info
 This project was undertaken as a self-imposed challenge to not only test my skills in C++ and Unreal Engine but also test drive the latest UE5.2 which I downloaded minutes before starting the excercise, with a dedicated focus to not use blueprints, plugins or any marketplace assets. The only models and materials used were starter content and royalty free models from SketchFab which I have included with all credits to each artist. All code created within the 48-hour period and is contained within the "code" folder. 
 
@@ -26,4 +20,5 @@ The codebase for Anti-Matter is divided into specific folders, each representing
 
 While this project stands as a testament to what can be achieved during a game jam, it's important to remember that speed sometimes makes it difficult to adhere to best coding practices. Nevertheless, every effort has been made to maintain clean, efficient, and well-documented code as best as possible.
 
-If you enjoyed this repo! Consider following me on GitHub or on twitter @[rumnizzle](https://twitter.com/rumnizzle) where I share cool stuff like this often!
+### Time-Lapse Video:
+[![Time-Lapse Video](https://img.youtube.com/vi/_smgEuS2xj8/0.jpg)](https://www.youtube.com/watch?v=_smgEuS2xj8)
