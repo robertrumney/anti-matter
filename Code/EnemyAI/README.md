@@ -18,6 +18,6 @@ This folder contains the source code for a simple example enemy AI implementatio
 
   - It calculates the distance between the enemy actor and the player actor. If the distance is less than 1.0f, it assumes that the enemy has caught up with the player and attempts to kill the player by calling the `Die` function on the player character.
 
-## Copyright
+### Copyright
 
 Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
