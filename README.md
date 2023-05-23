@@ -13,7 +13,7 @@ For the purpose of explaining this excercise, each class in the project has its 
 
 Anti-Matter is a first-person horror game which plunges the player into the role of a scientist waking up in a decimated laboratory. With his partner tragically dead and a monstrous creation of a twisted experiment on the loose, the player must navigate the perils of the damaged laboratory.
 
-The game features monologue voice overs, an atmospheric music score, and carefully designed audio to enhance the immersive experience. The first-person perspective, rather than relying on pre-existing templates, was crafted entirely from scratch, including elements such as camera movement, head bobbing, sprinting, and a simple inventory system for items like flashlights.
+The game features monologue voice overs, an atmospheric music score, and carefully designed audio to enhance the immersive experience. The first-person player controller, rather than relying on pre-existing templates, was crafted entirely from scratch in C++, including elements such as camera movement, head bobbing, sprinting, and a simple inventory system for items like flashlights.
 
 Within the initial 8 hours of the game jam, the basic structure of the game including the bespoke first-person controller was established. Following this, basic A.I. functionality was added along with environmental effects. A particularly noteworthy achievement during this period was the creation of a special level designer which allowed for the efficient programming of cinematic sound effects and events through asynchronous delays.
 
@@ -21,8 +21,4 @@ Within the initial 8 hours of the game jam, the basic structure of the game incl
 
 The codebase for Anti-Matter is divided into specific folders, each representing a class within the project. Each folder contains the .cpp and .h files for that class, and a README explaining the class's purpose, main methods, and interactions with other classes. This structure aims to foster an environment of readability and ease of navigation.
 
-While this project stands as a testament to what can be achieved during a game jam, it's important to remember that speed sometimes takes precedence over adherence to best coding practices. Nevertheless, every effort has been made to maintain clean, efficient, and well-documented code as best as possible.
-
-## Contributing
-
-While this project was primarily an individual undertaking, I appreciate the value of community and constructive feedback. Feel free to share your thoughts, open issues, or submit pull requests.
+While this project stands as a testament to what can be achieved during a game jam, it's important to remember that speed sometimes makes it difficult to adhere to best coding practices. Nevertheless, every effort has been made to maintain clean, efficient, and well-documented code as best as possible.
