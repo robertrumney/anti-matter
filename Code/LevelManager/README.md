@@ -1,12 +1,12 @@
-## Level Manager
+# Level Manager
 
 The Level Manager script is designed to provide a convenient way to manage and execute various actions within a game level in Unreal Engine. It allows you to define actions, such as making actors invisible, playing sounds, and destroying actors, and schedule them to occur either immediately or after a specified delay.
 
-### Purpose
+## Purpose
 
 The purpose of the Level Manager is to automate the execution of game actions within a level. Instead of manually triggering actions in the game code or through blueprint scripting, the Level Manager allows you to define actions and their properties in a centralized location. This provides flexibility and ease of maintenance, as you can modify or add new actions without having to modify multiple sections of code or blueprints.
 
-### How It Works
+## How It Works
 
 The Level Manager is implemented as an Unreal Engine actor class (`ALevelManager`) that can be placed in the game level. It utilizes a struct (`FGameAction`) to define individual actions and their properties. Here's how the script works:
 
@@ -21,5 +21,6 @@ The Level Manager is implemented as an Unreal Engine actor class (`ALevelManager
      - If the `bShouldInvisible` property is true, it makes the actor invisible by calling `SetActorHiddenInGame(true)` on the target actor.
      - If the `Sound` property is not null, it plays the specified sound at the location of the target actor using `UGameplayStatics::PlaySoundAtLocation`.
      - If the `bShouldDestroy` property is true, it destroys the target actor.
+     - More properties to be added soon!
 
-By using the Level Manager, you can easily define and schedule actions to be executed within a game level, adding more dynamism and automation to your game experience.
+By using the Level Manager, or even multiple instances of LevelManager - you can easily define and schedule actions to be executed within a game level, adding more dynamism and automation to your game experience.
