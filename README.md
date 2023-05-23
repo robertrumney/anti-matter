@@ -26,4 +26,4 @@ The codebase for Anti-Matter is divided into specific folders, each representing
 
 While this project stands as a testament to what can be achieved during a game jam, it's important to remember that speed sometimes makes it difficult to adhere to best coding practices. Nevertheless, every effort has been made to maintain clean, efficient, and well-documented code as best as possible.
 
-If you enjoyed this repo! Consider following me on GitHub or on twitter @ [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/rumnizzle.svg?style=social&label=Follow%20%40bukotsunikki)](https://twitter.com/rumnizzle) where I share cool stuff like this often!
+If you enjoyed this repo! Consider following me on GitHub or on twitter @ [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/rumnizzle.svg?style=social&label=Follow%20%rumnizzle)](https://twitter.com/rumnizzle) where I share cool stuff like this often!
