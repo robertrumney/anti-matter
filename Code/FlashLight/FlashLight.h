@@ -4,21 +4,29 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Flashlight.generated.h"
+#include "FlashLight.generated.h"
+
+class USpotLightComponent;
+class UStaticMeshComponent;
 
 UCLASS()
-class ANTIMATTERGAME_API AFlashlight : public AActor
+class ANTIMATTERGAME_API AFlashLight : public AActor
 {
 	GENERATED_BODY()
 
 public:
-	AFlashlight();
+	AFlashLight();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Light")
-		class USpotLightComponent* SpotLight;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+		USpotLightComponent* SpotLight;
 
-	void ToggleFlashlight();
+	virtual void ToggleFlashlight();
+
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
+
+private:
+	UStaticMeshComponent* FlashLightMesh;
 };
