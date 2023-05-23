@@ -1,6 +1,9 @@
 # Anti Matter
 48 Hour Unreal Engine game jam in C++ with no blueprints or marketplace plugins.
 
+### Sample Gameplay:
+[![Sample Gameplay](https://img.youtube.com/vi/cHrWfGWt8Mk/0.jpg)](https://www.youtube.com/watch?v=cHrWfGWt8Mk)
+
 ### Time-Lapse Video:
 [![Time-Lapse Video](https://img.youtube.com/vi/csn6bAA6DLI/0.jpg)](https://www.youtube.com/watch?v=csn6bAA6DLI)
 
@@ -22,3 +25,5 @@ Within the initial 8 hours of the game jam, the basic structure of the game incl
 The codebase for Anti-Matter is divided into specific folders, each representing a class within the project. Each folder contains the .cpp and .h files for that class, and a README explaining the class's purpose, main methods, and interactions with other classes. This structure aims to foster an environment of readability and ease of navigation.
 
 While this project stands as a testament to what can be achieved during a game jam, it's important to remember that speed sometimes makes it difficult to adhere to best coding practices. Nevertheless, every effort has been made to maintain clean, efficient, and well-documented code as best as possible.
+
+If you enjoyed this repo! Consider following me on GitHub or on twitter @ [![Twitter URL](https://img.shields.io/twitter/url/https/twitter.com/rumnizzle.svg?style=social&label=Follow%20%40bukotsunikki)](https://twitter.com/rumnizzle) where I share cool stuff like this often!
