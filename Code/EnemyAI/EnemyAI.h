@@ -1,38 +1,34 @@
-// EnemyAI.h
+// Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "GameFramework/Controller.h"
 #include "EnemyAI.generated.h"
 
 UCLASS()
-class ANTIMATTERGAME_API AEnemyAI : public AActor
+class ANTIMATTERGAME_API AEnemyAI : public AController
 {
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	AEnemyAI();
 
-	// The actor that EnemyAI will follow
-	UPROPERTY(EditAnywhere)
-		AActor* PlayerActor;
-
-	// The time before EnemyAI starts following the player
-	UPROPERTY(EditAnywhere)
-		float ActivationTime;
-
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-private:
-	FTimerHandle ActivationTimerHandle;
-
 	void FollowPlayer();
+
+	bool bIsActive = false;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyAI")
+		float ActivationTime;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyAI")
+		AActor* PlayerActor;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyAI")
+		AActor* EnemyActor;
+
 };
