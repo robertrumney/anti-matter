@@ -12,6 +12,11 @@
 
 #include "GameFramework/Controller.h"
 
+#include "Blueprint/UserWidget.h"
+#include "UObject/ConstructorHelpers.h"
+
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values
 AFPSPlayer::AFPSPlayer()
 {
@@ -224,34 +229,12 @@ void AFPSPlayer::PickupFlashLight()
 	{
 		// Spawn the flashlight actor at the player's location
 		FlashLight = GetWorld()->SpawnActor<AFlashLight>(AFlashLight::StaticClass(), GetActorTransform());
-
-		// Check if flashlight is successfully spawned
-		if (FlashLight)
-		{
-			// Attach the flashlight actor to the player's mesh
-			FlashLight->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
-
-			// If the flashlight should be attached to a specific socket on the player's mesh, use this instead:
-			// Flashlight->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, TEXT("SocketName"));
-
-			bHasFlashlight = true;
-
-			// Add spotlight component to the flashlight actor
-			USpotLightComponent* Spotlight = NewObject<USpotLightComponent>(FlashLight);
-			if (Spotlight)
-			{
-				// Set the properties of the spotlight
-				Spotlight->SetIntensity(5000.f);
-				Spotlight->SetOuterConeAngle(45.f);
-				Spotlight->SetInnerConeAngle(40.f);
-				Spotlight->SetAttenuationRadius(1000.f);
-				Spotlight->SetLightColor(FLinearColor::White);
-				Spotlight->SetCastShadows(true);
-				Spotlight->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
-
-				// Attach the spotlight to the flashlight actor
-				Spotlight->AttachToComponent(FlashLight->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
-			}
-		}
+		bHasFlashlight = true;
 	}
+}
+
+void AFPSPlayer::Die()
+{
+	// Restart the level
+	UGameplayStatics::OpenLevel(GetWorld(), FName(*GetWorld()->GetName()), false);
 }
