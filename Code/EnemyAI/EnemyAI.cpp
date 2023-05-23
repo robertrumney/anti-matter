@@ -11,7 +11,6 @@ AEnemyAI::AEnemyAI()
 void AEnemyAI::BeginPlay()
 {
 	Super::BeginPlay();
-	OnActorHit.AddDynamic(this, &AEnemyAI::OnHit);
 }
 
 void AEnemyAI::Tick(float DeltaTime)
@@ -61,24 +60,22 @@ void AEnemyAI::FollowPlayer()
 		// Move towards the player
 		float DeltaTime = GetWorld()->GetDeltaSeconds();
 		EnemyActor->SetActorLocation(EnemyActor->GetActorLocation() + Direction * 100 * DeltaTime);
-	}
-}
 
-void AEnemyAI::OnHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
-{
-	GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "We Hit Something");
-
-	// Check if the OtherActor is the player pawn
-	if (OtherActor && (OtherActor != this) && OtherActor->IsA(AFPSPlayer::StaticClass())) 
-	{
-		// Cast the OtherActor to the player pawn class
-		AFPSPlayer* PlayerCharacter = Cast<AFPSPlayer>(OtherActor); 
-
-		// If the cast is successful
-		if (PlayerCharacter) 
+		// Calculate the distance to the player
+		if (PlayerActor && EnemyActor)
 		{
-			// Call the Die function in the player pawn class
-			PlayerCharacter->Die(); 
+			float Distance = FVector::Dist(EnemyActor->GetActorLocation(), PlayerActor->GetActorLocation());
+
+			// If the distance is less than a certain value, kill the player
+			if (Distance < 1.0f)
+			{
+				AFPSPlayer* PlayerCharacter = Cast<AFPSPlayer>(PlayerActor);
+
+				if (PlayerCharacter)
+				{
+					PlayerCharacter->Die();
+				}
+			}
 		}
 	}
 }
