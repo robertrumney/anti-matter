@@ -24,3 +24,6 @@ The Level Manager is implemented as an Unreal Engine actor class (`ALevelManager
      - More properties to be added soon!
 
 By using the Level Manager, or even multiple instances of LevelManager - you can easily define and schedule actions to be executed within a game level, adding more dynamism and automation to your game experience.
+
+### Copyright
+Copyright 2023 Robert Rumney Unreal Engine C++ 48 Hour Game-Jam
