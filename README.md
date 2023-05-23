@@ -2,7 +2,7 @@
 48 Hour Unreal Engine game jam in C++ with no blueprints or marketplace plugins.
 
 ## Info
-This project was undertaken as a self-imposed challenge to not only demonstrate my skills in C++ and Unreal Engine but also test drive the latest version which I downloaded minutes before starting the excercise, with a dedicated focus to not use blueprints, plugins or any marketplace assets. The only models and materials used were starter content and royalty free models from SketchFab which I have included with all credits to each artist. All code created within the 48-hour period and is contained within the "code" folder. 
+This project was undertaken as a self-imposed challenge to not only demonstrate my skills in C++ and Unreal Engine but also test drive the latest UE5.2 which I downloaded minutes before starting the excercise, with a dedicated focus to not use blueprints, plugins or any marketplace assets. The only models and materials used were starter content and royalty free models from SketchFab which I have included with all credits to each artist. All code created within the 48-hour period and is contained within the "code" folder. 
 
 For the purpose of explaining this excercise, each class in the project has its own dedicated folder, housing its respective .cpp and .h files along with a unique README to describe its role and relationships within the greater project.
 
