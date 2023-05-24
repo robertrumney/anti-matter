@@ -21,4 +21,4 @@ The codebase for Anti-Matter is divided into specific folders, each representing
 While this project stands as a testament to what can be achieved during a game jam, it's important to remember that speed sometimes makes it difficult to adhere to best coding practices. Nevertheless, every effort has been made to maintain clean, efficient, and well-documented code as best as possible.
 
 ### Time-Lapse Video:
-[![Time-Lapse Video](https://img.youtube.com/vi/_smgEuS2xj8/0.jpg)](https://www.youtube.com/watch?v=_smgEuS2xj8)
+[![WATCH HERE](https://www.youtube.com/watch?v=_smgEuS2xj8)
