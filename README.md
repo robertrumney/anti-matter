@@ -10,7 +10,7 @@ For the purpose of explaining this excercise, each class in the project has its 
 
 Anti-Matter is a first-person horror game which plunges the player into the role of a scientist waking up in a decimated laboratory. With his partner tragically dead and a monstrous creation of a twisted experiment on the loose, the player must navigate the perils of the damaged laboratory.
 
-The game features monologue voice overs, an atmospheric music score, and carefully designed audio to enhance the immersive experience. The first-person player controller, rather than relying on pre-existing templates, was crafted entirely from scratch in C++, including elements such as camera movement, head bobbing, sprinting, and a simple inventory system for items like flashlights.
+The game features moody lighting, an atmospheric music score, and carefully designed audio to enhance the immersive experience. The first-person player controller, rather than relying on pre-existing templates, was crafted entirely from scratch in C++, including elements such as camera movement, head bobbing, sprinting, and a simple inventory system for items like flashlights.
 
 Within the initial 8 hours of the game jam, the basic structure of the game including the bespoke first-person controller was established. Following this, basic A.I. functionality was added along with environmental effects. A particularly noteworthy achievement during this period was the creation of a simple event sequencer which allowed for the efficient programming of cinematic sound effects and events in the inspector through asynchronous delays.
 
