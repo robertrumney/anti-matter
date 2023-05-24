@@ -1,1 +1,1 @@
-Asset files - more to come soon. :)
+All audio SFX from Freesound.org - the credits are in the actual filenames including the user ID. The images in artwork, such as tiled textures or desktop screens for the computers in the lab were generated with Midjourney to save time, as I was unable to hire artists for this game jam and did not have time to create these in Paint.NET myself.
